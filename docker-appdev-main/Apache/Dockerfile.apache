@@ -1,0 +1,17 @@
+# Dockerfile.apache
+FROM php:8.1-apache
+
+# Enable required Apache modules
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+
+# Copy application code to Apache document root
+COPY ./Apache/ /var/www/html/
+
+# Set appropriate permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose the web server port
+EXPOSE 80
+
+# Run Apache in the foreground
+CMD ["apache2-foreground"]

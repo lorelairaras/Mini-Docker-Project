@@ -1,0 +1,47 @@
+services:
+  node:
+    build:
+      context: .
+      dockerfile: /Node/Dockerfile.nodejs
+    container_name: node-container
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    depends_on:
+      - sql
+
+  apache:
+    build:
+      context: .
+      dockerfile: /Apache/Dockerfile.apache
+    container_name: apache-container
+    restart: always
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - sql
+      - node
+    
+
+  sql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: team5docker
+    volumes:
+      - ./Node/db_data:/var/lib/mysql
+      - ./Node/db/script.sql:/docker-entrypoint-initdb.d/script.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
